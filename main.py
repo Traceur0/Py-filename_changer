@@ -6,11 +6,16 @@ from re import compile, match
 # 현재 경로
 current_path: str = getcwd()
 
+Strs = tuple[str]
 
-def _input() -> None:
+
+def _input() -> Strs:
     while True:
         # Default input value
         str_raw: str = input("[🖍 ] Type the filename - template: ")
+        if str_raw == "main":
+            print("[⚠ ] Renaming main.py file is Prohibited.\n")
+            continue
 
         while True:
             str_alt: str = input("[🖍 ] Type the filename - ALT: ")
@@ -96,16 +101,20 @@ def name_modifier(file_names_refined: list, str_raw: str, str_alt: str, path: st
 
     for dir_file in file_names_refined:
         file_path: str = path + '\\' + dir_file
+        ext: str = extract_extension(file_path)
 
         regex = compile(fr'{str_raw}(\d+).(.+)')    # ex) itemname1.ext
         matched = regex.match(dir_file)
 
-        number_index: str = matched.group(1)
-        str_modified: str = str_alt + number_index + \
-            extract_extension(file_path)
+        try:
+            number_index: str = matched.group(1)
+            str_modified: str = str_alt + number_index + ext
+            print(
+                f"[🛠 ] filename '{dir_file}' has been modified to {str_modified}")
+        except:
+            print("[?] Seem to be there is no number index.")
+            str_modified: str = str_alt + ext
 
-        print(
-            f"[🛠 ] filename '{dir_file}' has been modified to {str_modified}")
         renames(dir_file, str_modified)
         count += 1
     print(f"[✔✔✔ ] DONE. {str(count)} file(s) has been renamed in total!")
